@@ -10,6 +10,8 @@ from codec_routines import login_to_codec #Did this to shorten the name
 from codec_routines import init_codec
 from codec_routines import set_room_control_screens
 import codec_routines #Did this to access the local variables, like cookie Jar defined in codec_routines
+from Button_class import Roomctl_Button
+import inspect # Reason to be able to check if a class exists.
 app = Flask(__name__)
 app.config['DEBUG'] = False
 userid="admin"
@@ -56,7 +58,23 @@ def codec_url():
             if tag_1=='type' and x.text:
                 widget_type=x.text.lower()
                 print(tag_1,format(widget_type))
-        return "ok"
+        #This is the button Handler.
+        #Rather than requirinf to cycle through all of the button names we have previously built an object for each active button.
+        #We check if there is a bidget ID field within an objet & if so if an object has been defined for it. It so we take the values from the RX'd
+        # XML and store them in the object and then action it. Note that object naems are constructed  as follows widget_id+"_widget"
+        #Firt build a widget name:
+        try:
+            button_widget = eval(widget_id + "_widget")  # Now we only need to do the eval once. Name error, if the widget didnt exist.
+            #
+            widget_id and button_widget
+            button_widget.widget_value=widget_value
+            button_widget.widget_type = widget_type
+            button_widget.button_action()  # Do whatever action is associated with the widget
+            return "ok"
+        except NameError:
+            #Return anyway at this point although there was a name error
+            return "ok"
+    return "ok"
 
 if __name__ == "__main__":
 
@@ -66,6 +84,8 @@ if __name__ == "__main__":
     init_codec(userid,password)
     #Not going to do this right now, as the upload process is complicated
     #set_room_control_screens(userid,password)
+    #Instantiate the room controll buttons.
+    temp_cntrl_widget=Roomctl_Button() # This is a test only - Instantiate button object.
     # Start the flask server to use the configured IP address of the interface.
     app.run(host="0.0.0.0", port=5000)
 

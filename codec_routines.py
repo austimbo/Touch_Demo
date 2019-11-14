@@ -23,7 +23,7 @@ def init_codec(userid,password):
                     <FeedbackSlot>1</FeedbackSlot>
                     <ServerUrl>http://{0}:5000/codec</ServerUrl>
                     <Format>XML</Format>
-                    <Expression>/Event/UserInterface/Extensions/Widget</Expression>         
+                    <Expression item="1">/Event/UserInterface/Extensions/Widget</Expression>
                 </Register>  
             </HttpFeedback>
         </Command>'''.format(IPAddr)
