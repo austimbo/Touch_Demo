@@ -81,3 +81,24 @@ def post_to_codec(userid,password,URL_sfx,xml_data):
         print("An Exception Occured {0}".format(sys.exc_info()[0]))
 
 
+#Function to retreive at information via a via HTTP GET
+#make a basic get to retreive the codec information
+#Note that get from codec has been modified. It builds the URL within get from codec.
+#The on;y the specific location (parameter) information is imported via the URL_sfx
+def get_from_codec(userid, password,URL_sfx):
+    auth = HTTPBasicAuth(userid, password)
+    global CodecIP
+    auth = HTTPBasicAuth(userid, password)
+    http_prefix = "http://{0}".format(CodecIP)
+    xml_get = "/getxml?location="
+    URL = http_prefix + xml_get+ URL_sfx
+    try:
+        response = requests.get(URL, cookies=cookies, timeout=(2, 5), verify=False, headers=headers, auth=auth)
+        print('Status Code: {0} for {1}'.format(response.status_code,URL))
+        return response
+
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("Error {0}".format(e))
+
+    except:
+        print("An Exception Occured {0}".format(sys.exc_info()[0]))
