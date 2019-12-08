@@ -85,11 +85,11 @@ def post_to_codec(userid,password,URL_sfx,xml_data):
 #make a basic get to retreive the codec information
 #Note that get from codec has been modified. It builds the URL within get from codec.
 #The on;y the specific location (parameter) information is imported via the URL_sfx
-def get_from_codec(userid, password,URL_sfx):
+def get_from_codec(userid, password,URL_sfx,Codec_IP):
     auth = HTTPBasicAuth(userid, password)
     global CodecIP
     auth = HTTPBasicAuth(userid, password)
-    http_prefix = "http://{0}".format(CodecIP)
+    http_prefix = "http://{0}".format(Codec_IP)
     xml_get = "/getxml?location="
     URL = http_prefix + xml_get+ URL_sfx
     try:

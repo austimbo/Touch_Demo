@@ -2,6 +2,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+import sys
 #https://developer.cisco.com/learning/tracks/collab-cloud/business-messaging/collab-spark-message/step/1
 # Bearer: OGYwNzUyNDYtODkwMi00ZWFiLThhOWYtY2E3Mjc1YTc5OTQ1YWM2MzI1NTEtZjZk_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f
 #https://developer.webex.com/docs/api/v1/people/get-my-own-detailshttps://developer.webex.com/docs/api/v1/people/get-my-own-details
@@ -39,7 +40,8 @@ cxc_ais_teams_roomid='Y2lzY29zcGFyazovL3VzL1JPT00vYzBiZDMzODAtODk2NC0xMWU4LWJiZj
 
 class webex_msg(object):
     webex_URL = 'https://api.ciscospark.com/v1/'
-    auth_header= "Bearer ZWYzYmUyMWYtZDM3OS00N2Y3LWJkMzctZDUzZmVhNDkwYzNmNTA5ODcyYzgtYTdi_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+    #auth_header= "Bearer ZWYzYmUyMWYtZDM3OS00N2Y3LWJkMzctZDUzZmVhNDkwYzNmNTA5ODcyYzgtYTdi_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+    auth_header= "Bearer YzZjMDFkOTAtNTcwYS00YzRiLTg2NzItOTcxYTZjMjk3MWZjMzk4MWU4NjQtZmMz_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
     headers= {'Authorization': auth_header, 'content-type' : content_type}
 
     def __init__(self,email_id):
@@ -60,12 +62,12 @@ class webex_msg(object):
         except:
             print("An Exception Occured {0}".format(sys.exc_info()[0]))
 
-
+'''
 if __name__ == "__main__":
     x=webex_msg("daalberg@cisco.com")
-    z=x.send_webex_message('This is a test message 3')
+    z=x.send_webex_message('This is a test message 3 building touch 10 integration')
     print("Status_code {0}".format(z))
-
+'''
 
 
 
