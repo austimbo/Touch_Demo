@@ -40,7 +40,6 @@ def set_room_control_screens(userid,password):
             </UserInterface>
         </Command> '''
 
-    
     #open the file containing throom control definitions
     with open ("roomcontrolconfig.xml", "r") as room_ctl_file:
          room_ctl_xml=room_ctl_file.readlines()

@@ -4,7 +4,7 @@
 #This is the main module for the touch server application
 #Include Modules
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from lxml import etree
 from codec_routines import login_to_codec #Did this to shorten the name
 from codec_routines import init_codec
@@ -16,6 +16,10 @@ from Button_class import build_button_objects
 from Button_class import get_some_xml
 from Button_class import button_objects
 from Button_class import extract_value_from_xml_t
+import teams_integration
+from teams_integration import get_WT_access_tokens
+from teams_integration import init_WT_security_parms
+import time
 import inspect # Reason to be able to check if a class exists.
 app = Flask(__name__)
 app.config['DEBUG'] = False
@@ -24,10 +28,33 @@ password="cisco"
 codec_routines.CodecIP="192.168.0.42"
 
 
+
+#redirect_uri = "http://0.0.0.0:5000/oauth"
+
+
+
 @app.route('/')
 def index_url():
+     return render_template("index.html")
+     #'<h1>Hello World</h1> \n <p>This is the Index page {0}</p>'
 
-    return '<h1>Hello World</h1> \n <p>This is the Index page {0}</p>'
+
+@app.route('/oauth', methods=['POST', 'GET' ] ) #Endpoint acting as Redirect URI. Redirected tohere after requesing permission.
+def oauth():
+    """Retrieves oauth code in readiness to generate tokens for users"""
+    global code #Turn code to a global, as its also required when refreshing a token.
+    if "code" in request.args:  # and state == "YOUR_STATE_STRING":
+        state = request.args.get("state")  # Captures value of the state.
+        teams_integration.Access_code = request.args.get("code")  # Captures value of the code.
+        print("OAuth code: {0}".format(teams_integration.Access_code))
+        print("OAuth state: {0}".format(state))
+    #Lets retreive the token from Webext teams ath.
+        teams_integration.access_token, teams_integration.refresh_token = get_WT_access_tokens(teams_integration.Access_code,teams_integration.Client_ID,teams_integration.Secret_ID)
+    #Still need some sort of error handling here. Might also set token values within in the functiom & error out on a bad status code.
+    else:
+        print("Didn't Receve a respomse when requesting an access token")
+        return "Error"
+    return render_template("granted.html")
 
 #This is the URL set to sent feedback to in the codec
 @app.route('/codec', methods=['POST', 'GET' ])
@@ -113,6 +140,7 @@ if __name__ == "__main__":
     network_parameters=get_some_xml(userid,password,"/status/network",codec_routines.CodecIP)
     #Extract identification parameters from the currently addressed codec.
     system_mac=extract_value_from_xml_t(network_parameters,"/Network/Ethernet/MacAddress")
+    system_ip=extract_value_from_xml_t(network_parameters,"/Network/IPv4/Address")
     #http://<Codec IP>/getxml?location=status/userinterface/extensions
     system_widgets=get_widget_xml(userid, password,codec_routines.CodecIP)
     #Need to eventually insert code to check that we got the correct xml code back.
@@ -120,7 +148,23 @@ if __name__ == "__main__":
     print("From Coded Poll\n System Name: {0}\t System Mac: {1}\n\n".format(system_name,system_mac))
     #The below function builds a dynamic object for each button (Button_class.py)
     #If it has a name of Temp_cntrl its object will be call "temp_cntrl_widget"
-    build_button_objects(system_widgets.text,system_name,system_mac)
+    build_button_objects(system_widgets.text,system_name,system_mac,system_ip)
+    #Initialise Webex teams security/Autherization parameters - Secret ID Client ID etc.
+    Client_ID, Secret_ID=init_WT_security_parms()
+    print("Client_ID: {0}\t Secret_ID: {1} (From Environment variables)".format(Client_ID,Secret_ID))
+    #Sign on to Webex Teams Via Oauth
+    #First get access code
+    #This was a nice idea but it doexnt work, for two reasons.
+    #1. Webex teams requires that a user first sign on with userid and password.
+    #2. The web server (on this machine )must be first started in order to capture the redirect. This is possible but will require a different
+    #Task or thread or something.
+    #response=request_WT_auth_code(Client_ID,redirect_uri)
+    #if response.status_code==200:
+    #    print("Successfully obtained Access Code - Status Code: {0}".format(response.status_code))
+    #else:
+    #    print("Unable to obtain Access code - Status Code: {0}".format(response.status_code))
+    #We spould probaby bail out here but will do that later.
+    #The remainder of the authentication takes place under the @/oauth code in the flask server
     # Start the flask server to use the configured IP address of the interface.
     app.run(host="0.0.0.0", port=5000)
 

@@ -35,42 +35,42 @@ class Roomctl_Button(object):
     # Code executed when trigger events happen.
     #Remember not to put brackets
         if self.widget_action:
-            self.widget_action(self.widget_id, self.widget_value, self.widget_type)
+            self.widget_action(self.widget_id, self.widget_value, self.widget_type,self.system_name,self.system_ip,self.system_mac)
             #Here we can decide on the different actions for different types, clicked (pressed released)
 
 
 #this routine is called when the temperature button is called
-def temperature_cntrl_routine(widget_id, widget_value, widget_type):
+def temperature_cntrl_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac):
     print("This is from the button routine\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
 
 #this routine is called when the temperature button is called
-def beverage_help_routine(widget_id, widget_value, widget_type):
+def beverage_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac):
     print("Beer required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
         x=webex_msg("daalberg@cisco.com")
-        z=x.send_webex_message('This is a test message - Beer Required in {0}\n{1}\n,{2}\n'.format(widget_id,widget_value,widget_type))
+        z=x.send_webex_message('This is a test message - Beer Required in {0}\'s room\n Widget Value:{1}\n Event Type:{2}\n IP Address:{3} \t System mac:{4} '.format(system_name, widget_value, widget_type, system_ip, system_mac ))
         print("Status_code {0}".format(z))
 
 #this routine is called when the temperature button is called
-def tech_help_routine(widget_id, widget_value, widget_type):
+def tech_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac):
     print("Technical Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
         x=webex_msg("daalberg@cisco.com")
-        z=x.send_webex_message('This is a test message - Technical Help Required in  {0}\n{1}\n,{2}\n'.format(widget_id,widget_value,widget_type))
+        z=x.send_webex_message('This is a test message - Technical Help Required in {0}\'s room\n Widget Value:{1}\n Event Type:{2}\n'.format(system_name, widget_value,widget_type))
         print("Status_code {0}".format(z))
 
-def catering_help_routine(widget_id, widget_value, widget_type):
+def catering_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac):
     print("Catering Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type,))
     if widget_type == "clicked":
         x=webex_msg("daalberg@cisco.com")
-        z=x.send_webex_message('This is a test message - Catering Help Required in  {0}\n{1}\n,{2}\n'.format(widget_id,widget_value,widget_type))
+        z=x.send_webex_message('This is a test message - Catering Help Required in  {0}\'s room \n{1}\n Event Type:{2}\n'.format(system_name, widget_value,widget_type))
         print("Status_code {0}".format(z))
 
-def log_help_routine(widget_id, widget_value, widget_type):
+def log_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac):
     print("Logistics Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
         x=webex_msg("daalberg@cisco.com")
-        z=x.send_webex_message('This is a test message - Logistics Help Required in  {0}\n{1}\n,{2}\n'.format(widget_id,widget_value,widget_type))
+        z=x.send_webex_message('This is a test message - Logistics Help Required in  {0}\'s room\n Widget Value:{1}\n Event Type:{2}\n'.format(system_name, widget_value,widget_type))
         print("Status_code {0}".format(z))
 
 button_actions = {'temp_cntrl': temperature_cntrl_routine,
@@ -103,13 +103,13 @@ def extract_value_from_xml_t(xml_text_string,xml_path):
     xml_text_value = response_xml_obj.find('./'+xml_path)
     return xml_text_value.text
 
-def build_button_objects(xml_string_string,system_name,system_mac):
+def build_button_objects(xml_string_string,system_name,system_mac,system_ip):
     #First we take the text string returned to us from the codec.
     #Use etree fromstring to turn it into an etree object.
     response_xml_object = objectify.fromstring(xml_string_string)
     #Now we retreive all of the buttone from the object.
     #print(etree.tostring(response_xml_object,pretty_print=True))
-    for elem in response_xml_object.getchildren(): #Just to step in over the first tag whuch is  <UserInterface>
+    for elem in response_xml_object.getchildren(): #Just to step in over the first tag which is  <UserInterface>
         for widget in elem.Extensions.getchildren():
             #Here we pul back all interesting information about each button/widget
             if widget.WidgetId.text:
@@ -133,6 +133,7 @@ def build_button_objects(xml_string_string,system_name,system_mac):
                 try:
                     button_objects[widget_object_name].widget_action = button_actions[widget_id]
                     button_objects[widget_object_name].system_name=system_name
+                    button_objects[widget_object_name].system_ip = system_ip
                     button_objects[widget_object_name].system_mac = system_mac
                 except KeyError:
                     print("Key Error, no routine defined for:  {0}\n".format(widget_id))
