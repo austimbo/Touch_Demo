@@ -1,62 +1,82 @@
-
 <Extensions>
-  <Version>1.2</Version>
+  <Version>1.5</Version>
   <Panel>
-    <Icon>Lightbulb</Icon>
-    <Type>Home</Type>
+    <PanelId>CATS_panel_1</PanelId>
+    <Type>Statusbar</Type>
+    <Icon>Concierge</Icon>
+    <Order>1</Order>
+    <Name>CATS</Name>
     <Page>
+      <Name> CATS - Customer Alerts Tracking System</Name>
       <Row>
+        <Name>Logistics Team</Name>
         <Widget>
-          <WidgetId>widget_3</WidgetId>
-          <Type>Text</Type>
+          <WidgetId>Log_help</WidgetId>
+          <Name>Request Logistics Help</Name>
+          <Type>Button</Type>
           <Options>size=4</Options>
         </Widget>
+        <Widget>
+          <WidgetId>log_help_status</WidgetId>
+          <Name>Request Status</Name>
+          <Type>Text</Type>
+          <Options>size=4;fontSize=small;align=center</Options>
+        </Widget>
       </Row>
       <Row>
+        <Name>Technical Team</Name>
         <Widget>
-          <WidgetId>widget_4</WidgetId>
-          <Type>Text</Type>
+          <WidgetId>tech_help</WidgetId>
+          <Name>Technical Help</Name>
+          <Type>Button</Type>
           <Options>size=4</Options>
         </Widget>
+        <Widget>
+          <WidgetId>tech_help_status</WidgetId>
+          <Name>Request Status</Name>
+          <Type>Text</Type>
+          <Options>size=4;fontSize=small;align=center</Options>
+        </Widget>
       </Row>
       <Row>
+        <Name>Catering Team</Name>
         <Widget>
-          <WidgetId>widget_5</WidgetId>
-          <Type>Text</Type>
+          <WidgetId>catering_help</WidgetId>
+          <Name>Catering Help</Name>
+          <Type>Button</Type>
           <Options>size=4</Options>
         </Widget>
-      </Row>
-      <Row>
-        <Name>Call</Name>
         <Widget>
-          <WidgetId>widget_9</WidgetId>
-          <Type>Button</Type>
-          <Options>size=1</Options>
-        </Widget>
-        <Widget>
-          <WidgetId>widget_8</WidgetId>
-          <Type>Button</Type>
-          <Options>size=1</Options>
-        </Widget>
-        <Widget>
-          <WidgetId>widget_7</WidgetId>
-          <Type>Button</Type>
-          <Options>size=1</Options>
-        </Widget>
-        <Widget>
-          <WidgetId>widget_6</WidgetId>
-          <Type>Button</Type>
-          <Options>size=1</Options>
+          <WidgetId>catering_help_status</WidgetId>
+          <Name>Request Status</Name>
+          <Type>Text</Type>
+          <Options>size=4;fontSize=small;align=center</Options>
         </Widget>
       </Row>
       <Row>
-        <Name>Blinds</Name>
+        <Name>Beer Team</Name>
         <Widget>
-          <WidgetId>widget_10</WidgetId>
-          <Type>Spinner</Type>
-          <Options>size=2</Options>
+          <WidgetId>bev_help</WidgetId>
+          <Name>Beer Run</Name>
+          <Type>Button</Type>
+          <Options>size=4</Options>
+        </Widget>
+        <Widget>
+          <WidgetId>bev_help_status</WidgetId>
+          <Name>Request Status</Name>
+          <Type>Text</Type>
+          <Options>size=4;fontSize=small;align=center</Options>
         </Widget>
       </Row>
+      <Options/>
     </Page>
+  </Panel>
+  <Panel>
+    <PanelId>panel_2</PanelId>
+    <Type>Statusbar</Type>
+    <Icon>Lightbulb</Icon>
+    <Order>2</Order>
+    <Color>#FF3D67</Color>
+    <Name>Panel</Name>
   </Panel>
 </Extensions>
