@@ -5,7 +5,7 @@ import os
 
 def ip_of_machine():
     hostname = socket.gethostname()
-    IPAddr = socket.gethostbyname(hostname)
+    IPAddr = socket.gethostbyname('Tims-iMac')
     return IPAddr
 
 

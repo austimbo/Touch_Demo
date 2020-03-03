@@ -3,8 +3,12 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import sys
+import time
 from os import environ
 import webbrowser
+import Incident_manager
+from Incident_manager import touch_buddy_incidents as touch_buddy_incidents
+
 
 
 #Global Variables
@@ -21,6 +25,8 @@ content_type='application/json'
 path='messages'
 email_id='tleach@cisco.com'
 cxc_ais_teams_roomid='Y2lzY29zcGFyazovL3VzL1JPT00vYzBiZDMzODAtODk2NC0xMWU4LWJiZjgtZmIxOWQ1ZmY1NzAy'
+touch_buddy_allerts_roomid='Y2lzY29zcGFyazovL3VzL1JPT00vNGI3MGQ4ZTAtNGNjMC0xMWVhLTkyYjQtZDNjYjc0Nzc5ODAz'
+
 redirect_uri = "http://0.0.0.0:5000/oauth"
 refreshed = False
 
@@ -46,23 +52,35 @@ class webex_msg(object):
     #auth_header = ("Bearer " + access_token) #Now that we have the bearer created dynamically.
     #headers= {'Authorization': auth_header, 'content-type' : content_type}
 
-    def __init__(self,email_id):
+    def __init__(self):
         print("Webex Teams Object Instantiated\n URL={0}".format(webex_msg.webex_URL+path))
         self.email_id=email_id
         self.cxc_ais_teams_roomid=cxc_ais_teams_roomid
+        self.touch_buddy_allerts_roomid=touch_buddy_allerts_roomid
+        self.auth_header = ("Bearer " + access_token)  # Now that we have the bearer created dynamically.
+        self.headers = {'Authorization': self.auth_header, 'content-type': content_type}
 
     def send_webex_message(self, message_text ):
-
         auth_header = ("Bearer " + access_token)  # Now that we have the bearer created dynamically.
-        # This is  "Test Code" -Deliberately fuck up the access token to force a refresh by inserting an expireed one. 
-        if not refreshed:
-            print ("Setting false access token to test")
-            auth_header = "Bearer ZWYzYmUyMWYtZDM3OS00N2Y3LWJkMzctZDUzZmVhNDkwYzNmNTA5ODcyYzgtYTdi_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"  # Test Access_Token
+        # This is  "Test Code" -Deliberately fuck up the access token to force a refresh by inserting an expireed one.
+        # Uncomment only when testing
+        #if not refreshed:
+        #    print ("Setting false access token to test")
+        #    auth_header = "Bearer ZWYzYmUyMWYtZDM3OS00N2Y3LWJkMzctZDUzZmVhNDkwYzNmNTA5ODcyYzgtYTdi_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"  # Test Access_Token
 
-        headers = {'Authorization': auth_header, 'content-type': content_type}
-        payload = {"roomId": self.cxc_ais_teams_roomid , "text": message_text}
+        #headers = {'Authorization': auth_header, 'content-type': content_type}
+        #payload = {"roomId": self.cxc_ais_teams_roomid , "text": message_text}
+        #payload = {"roomId": self.touch_buddy_allerts_roomid, "text": message_text}
+
+        json_payload= message_text
+        print("From Send Webex Message" + message_text)
+
+
+#"url": "http://upload.wikimedia.org/wikipedia/commons/b/b2/Diver_Silhouette%2C_Great_Barrier_Reef.jpg",
+
         try:
-            self.webex_request = requests.post(webex_msg.webex_URL + path, data=json.dumps(payload), headers=headers)
+            #self.webex_request = requests.post(webex_msg.webex_URL + path, data=json.dumps(payload), headers=headers)
+            self.webex_request = requests.post(webex_msg.webex_URL + path, data=json_payload, headers=self.headers)
             self.webex_request.raise_for_status()
             return self.webex_request.status_code
 
@@ -186,14 +204,57 @@ def init_WT_security_parms():
     return  Client_ID,Secret_ID
 
 
+def process_card_ack(card_act_dict): # The json is already loaded int a Python dictionary by Flask
+    WT_person_id=card_act_dict['data']['personId']
+    WT_data_id = card_act_dict['data']['id']
+    #print ("Person ID Who acknowledged request: {0}".format(WT_person_id))
+    #Now its time to look at the person ID and get the details.
+    #Use a request.get to https://api.ciscospark.com/v1/people/{personId}
+    wt_person_details_dict=webex_teams_qet_querey("people/"+ WT_person_id)
+    #print(json.dumps(wt_person_details_dict, indent=4))
+    # Extract certain details about party acknowledding the request.
 
+    #Retreive information about the data in the card. Hopefully the fieds
+    wt_data_details_dic = webex_teams_qet_querey('attachment/actions/' + WT_data_id)
+    #print(json.dumps(wt_data_details_dic, indent=4))
+    incident_object_name=wt_data_details_dic['inputs']['incident_num']
+    # Now Lets Extract the Information that we require
+    # Userid/email
+    touch_buddy_incidents[incident_object_name].actioned_by_email = wt_person_details_dict['emails'][0]
+    # Name
+    touch_buddy_incidents[incident_object_name].actioned_by_name = wt_person_details_dict['displayName']
+    name = wt_person_details_dict['displayName']
+    # Phone number
+    phonenumber_1 = wt_person_details_dict['phoneNumbers'][0]['value']
+    touch_buddy_incidents[incident_object_name].actioned_by_phone = wt_person_details_dict['phoneNumbers'][0]['value']
+    #set the actioned time stamp
+    seconds = time.time()
+    touch_buddy_incidents[incident_object_name].actioned_time = time.ctime(seconds)
+    print("Email: {0}\t  Name: {1} \t Phone: {2} \t Incident name: {3}".format(touch_buddy_incidents[incident_object_name].actioned_by_email, touch_buddy_incidents[incident_object_name].actioned_by_name, touch_buddy_incidents[incident_object_name].actioned_by_phone,
+                                                                               incident_object_name))
+    #OK So now that we have all of the relevant information send an update to the touch 10
+    touch_buddy_incidents[incident_object_name].Incident_acknowledget()
+    return
 
-'''
-if __name__ == "__main__":
-    x=webex_msg("daalberg@cisco.com")
-    z=x.send_webex_message('This is a test message 3 building touch 10 integration')
-    print("Status_code {0}".format(z))
-'''
+def webex_teams_qet_querey(url_suffix):
+    webex_URL = 'https://api.ciscospark.com/v1/'
+    auth_header = ("Bearer " + access_token)  # Now that we have the bearer created dynamically.
+    headers = {'Authorization': auth_header, 'content-type': content_type}
+    try:
+        webex_response = requests.get(webex_URL+url_suffix, headers=headers)
+        webex_response.raise_for_status()
+        return webex_response.json()
+
+    # Requests Expeption processing
+    # This exception looks for a HTTPP status code 401. $01 means that the access token used was invalid or expireds. We use refresh_token to obtain another one.
+    except requests.exceptions.HTTPError as e:
+        print("Error {0}".format(e))
+        if e.response.status_code == 401:
+            print("Webex access Tken has Expired")
+
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("Error {0}".format(e))
+
 
 
 
