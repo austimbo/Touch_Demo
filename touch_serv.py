@@ -48,7 +48,7 @@ def index_url():
 @app.route('/webhooks', methods=['POST', 'GET' ] ) #URL that webhooks hit
 def webhooks():
     print("yo got a webhook!!!")
-    print (request.json)  #Dumps out the entire data field.
+    #print (request.json)  #Dumps out the entire data field.
     card_ack_json=request.json #Get ready to process in the teams_integrtation module.
     process_card_ack(card_ack_json)
     return "ok"

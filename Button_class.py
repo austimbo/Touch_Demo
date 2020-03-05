@@ -57,61 +57,29 @@ def temperature_cntrl_routine(widget_id, widget_value, widget_type, system_name,
 def beverage_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac,widget_object_name):
     print("Beer required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
-        # Build a webex message object.
-        x = webex_msg()
-        # Generabe an incident object.
+        # Generabe an incident object. This does everythin associated with opening an incident
         incident_object_name = generate_incident(widget_object_name)
-        # Generate an adaptive card. This uses a method in the incident object
-        zz = Incident_manager.touch_buddy_incidents[incident_object_name].generate_incident_adaptive_card()
-        # Send the message via Webex Teams
-        z = x.send_webex_message(zz)
-        # Print the status code to the console
-        print("Status_code {0} Incident object name: {1}".format(z, incident_object_name))
 
 
 #this routine is called when the temperature button is called
 def tech_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac, widget_object_name):
     print("Technical Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
-        #Build a webex message object.
-        x=webex_msg()
-        #Generabe an incident object.
-        incident_object_name=generate_incident(widget_object_name)
-        #Generate an adaptive card. This uses a method in the incident object
-        zz=Incident_manager.touch_buddy_incidents[incident_object_name].generate_incident_adaptive_card()
-        #Send the message via Webex Teams
-        z=x.send_webex_message(zz)
-        #Print the status code to the console
-        print("Status_code {0} Incident object name: {1}".format(z, incident_object_name))
+        # Generabe an incident object. This does everythin associated with opening an incident
+        incident_object_name = generate_incident(widget_object_name)
 
 
 def catering_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac, widget_object_name):
     print("Catering Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type,))
     if widget_type == "clicked":
-        # Build a webex message object.
-        x = webex_msg()
-        # Generabe an incident object.
+        # Generabe an incident object. This does everythin associated with opening an incident
         incident_object_name = generate_incident(widget_object_name)
-        # Generate an adaptive card. This uses a method in the incident object
-        zz = Incident_manager.touch_buddy_incidents[incident_object_name].generate_incident_adaptive_card()
-        # Send the message via Webex Teams
-        z = x.send_webex_message(zz)
-        # Print the status code to the console
-        print("Status_code {0} Incident object name: {1}".format(z, incident_object_name))
 
 def log_help_routine(widget_id, widget_value, widget_type, system_name, system_ip, system_mac, widget_object_name):
     print("Logistics Help required\n ID: {0}\t Value: {1}\t Type: {2}\n".format(widget_id,widget_value,widget_type))
     if widget_type == "clicked":
-        # Build a webex message object.
-        x = webex_msg()
-        # Generabe an incident object.
+        # Generabe an incident object. This does everythin associated with opening an incident
         incident_object_name = generate_incident(widget_object_name)
-        # Generate an adaptive card. This uses a method in the incident object
-        zz = Incident_manager.touch_buddy_incidents[incident_object_name].generate_incident_adaptive_card()
-        # Send the message via Webex Teams
-        z = x.send_webex_message(zz)
-        # Print the status code to the console
-        print("Status_code {0} Incident object name: {1}".format(z, incident_object_name))
 
 button_actions = {'temp_cntrl': temperature_cntrl_routine,
                   'bev_help': beverage_help_routine,

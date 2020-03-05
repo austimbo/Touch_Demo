@@ -233,7 +233,8 @@ def process_card_ack(card_act_dict): # The json is already loaded int a Python d
     print("Email: {0}\t  Name: {1} \t Phone: {2} \t Incident name: {3}".format(touch_buddy_incidents[incident_object_name].actioned_by_email, touch_buddy_incidents[incident_object_name].actioned_by_name, touch_buddy_incidents[incident_object_name].actioned_by_phone,
                                                                                incident_object_name))
     #OK So now that we have all of the relevant information send an update to the touch 10
-    touch_buddy_incidents[incident_object_name].Incident_acknowledget()
+    #touch_buddy_incidents[incident_object_name].Incident_acknowledget()
+    touch_buddy_incidents[incident_object_name].incident_change_status('Acknowledged')
     return
 
 def webex_teams_qet_querey(url_suffix):
