@@ -22,6 +22,7 @@ import teams_integration
 from teams_integration import get_WT_access_tokens
 from teams_integration import init_WT_security_parms
 from teams_integration import process_card_ack
+from database_routines import incident_database_init as incident_database_init
 import time
 import inspect # Reason to be able to check if a class exists.
 import os
@@ -138,6 +139,10 @@ def codec_url():
 if __name__ == "__main__":
 
     # open the file contining information for all of the codes.
+    #General once-off initialization functions
+    #Check if there is a database file. Create and Initialize with schema if not.
+    incident_database_init()
+    #
     with open( codec_file, 'r') as codec_info_f:
         print ("Absolute path is: {0}".format(os.path.abspath(codec_file)))
         for codec_csv in codec_info_f:    #Do all of this stuff for each codec in the list.

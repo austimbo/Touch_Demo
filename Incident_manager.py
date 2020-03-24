@@ -4,6 +4,8 @@ import Button_class
 import time
 from codec_routines import write_to_widget
 from codec_routines import touch_serv_codecs
+from database_routines import create_incident_db_rec
+from database_routines import ch_incident_db_rec_status
 import teams_integration
 
 incident_number=0
@@ -80,14 +82,16 @@ class touch_buddy_Incident(object):
             print("Acknowledging Incident Number: {0} Status: {1}".format(self.incident_number, self.status))
             write_to_widget('admin', 'cisco', self.widget_status_field, "{0}  {1} {2} {3}".format(self.incident_object_name, self.status,self.actioned_by_name, self.actioned_by_phone),self.CodecIP)
             return "ok"
+
         def incident_change_status(self,status):
-            #Possible status's are currently Open, Acknowledged, Closed
+            #Possible status's are currently Initia;, Open, Acknowledged, Closed
+            #Initial is a very transient state and shouldnt be seen here.
             status_s={'Open':'Open', 'Acknowledged':'Acknowledged', 'Closed':'Closed'}
-            # Is this a re-status - incident os already Open or already Acknowledged.
+            # Is this a re-status - incident is already Open or already Acknowledged.
             #remember the previous status
 
             #First filter for known types
-            # Set the self.status property
+            # Set the self.status property within the incident.
             try:
                     self.status=status_s[status]
             except KeyError:
@@ -100,18 +104,62 @@ class touch_buddy_Incident(object):
             #Take the appropraite action for that status change type.
             if self.status=='Open':
                 widget_message='Incident: {0} - Status: {1} calls: {2}'.format(self.incident_object_name, self.status, self.call_counter)
+                #Now lets do the needful to the database and change the status of the rerod to open
+                # & insert other information that we know about.
+                #This is a standard template.
+                record_dict_open = {'status': 'Open',
+                                 'incident_object_name' : self.incident_object_name,
+                                 'widget_id': self.widget_id,
+                                 'system_site': self.system_site,
+                                 'system_room': self.system_room,
+                                 'actioned_by_name': '',
+                                 'created_time': '',  #Placeholder taken care of in the function.
+                                 'actioned_time': 'actioned time', #These times are just placeholders.
+                                 'resolved_time': "resolved_time", #These times are just placeholders.
+                                 'actioned_by_phone': '',
+                                 'actioned_by_email': '',
+                                 'record_no': self.incident_number #Important primary key
+                                 }
+                lastrowid=ch_incident_db_rec_status(record_dict_open)
 
             if self.status == 'Acknowledged':
                 widget_message="{0} {1} {2} {3} {4}  ".format(self.status, self.incident_object_name,  self.actioned_by_name, self.actioned_by_phone, self.call_counter)
+                record_dict_acknowldged  = {'status': 'Acknowledged',
+                                 'incident_object_name': self.incident_object_name,
+                                 'widget_id': '',
+                                 'system_site': '',
+                                 'system_room': '',
+                                 'actioned_by_name': self.actioned_by_name,
+                                 'created_time': '', #Placeholder taken care of in the function.
+                                 'actioned_time': '', # Actioned Time will be updated within the function
+                                 'resolved_time': '',
+                                 'actioned_by_phone': self.actioned_by_phone,
+                                 'actioned_by_email': self.actioned_by_email,
+                                 'record_no': self.incident_number
+                                 }
+                lastrowid = ch_incident_db_rec_status(record_dict_acknowldged )
 
-            if self.status == 'Closed':
+            if self.status == 'Resolved':
                 widget_message="{0} {1} {2} {3} {4} ".format(self.status, self.incident_object_name,  self.actioned_by_name, self.actioned_by_phone, self.call_counter)
 
-            # Write status chenge to the database (Future)
-
-                #Write to the widget
-            print(widget_message)
-            #write_to_widget('admin', 'cisco', self.widget_status_field, widget_message,self.CodecIP)
+            # Write status chenge to the database (Future) haha it is here now!
+                record_dict_resolved = {'status': 'Resolved',
+                             'widget_id': '',
+                             'system_site': '',
+                             'system_room': '',
+                             'actioned_by_name': '',
+                             'created_time': '',
+                             'actioned_time': '',
+                             'resolved_time': "resolved_time", #Placeholder taken care of in the function.
+                             'actioned_by_phone': '',
+                             'actioned_by_email': '',
+                             'record_no': self.incident_number
+                             }
+                lastrowid = ch_incident_db_rec_status(record_dict_resolved)
+                #Here we need to fee up button busy etc sy that the same button can used for its next call.
+                Button_class.button_objects[self.widget_object_name].button_busy = False
+        #Write the message built above to appropraite touch 10 widget
+            print("{0} {1}".format(widget_message,self.created_time))
             write_to_widget( touch_serv_codecs[self.system_name].userid, touch_serv_codecs[self.system_name].password, self.widget_status_field, widget_message, self.CodecIP)
             return "ok"
 
@@ -123,28 +171,51 @@ def generate_incident(widget_object_name): #Opens a touch buddy incident
         #Means that there is an outstanding incident already. No Need to generate another incident.
         #We will just update Just call the press count.
         #Here we are experiencing a re-status situation . We will in future re-write the status with an updates counter
-        print("Re-status condition being experience on {0}".format(widget_object_name))
+        print("Re-status condition being experienced on {0}".format(widget_object_name))
         #We will do an incident status re-write with the same status
         incident_object_name="TBI" + str(Button_class.button_objects[widget_object_name].incident_number)
         print("Re-Status Condition {0}".format(incident_object_name))
         #Not the best way to do it but rewriting the current status bact to the incident object to increment the calls counter.
         touch_buddy_incidents[incident_object_name].incident_change_status(touch_buddy_incidents[incident_object_name].status)
     else:
-        incident_number=generate_incident_number()
+        #Insert record into the database here
+        #Use lastrow ID from the DB instead of generating the incident number
+        #Fill in the following fields with what we know about the incident so far.
+
+        record_dict_create = {'status': 'Initial',
+                         'incident_object_name': '',
+                         'widget_id': 'log_help',
+                         'system_site': '',
+                         'system_room': '',
+                         'actioned_by_name': '',
+                         'created_time': '', #Taken care of in the database routine
+                         'actioned_time': "actioned_time",
+                         'resolved_time': "resolved_time",
+                         'actioned_by_phone': '',
+                         'actioned_by_email': '',
+                         'record_no': 0
+                         }
+        incident_number=create_incident_db_rec(record_dict_create) #Except we are best to create a cresh DB conn each time.
+        #incident_number=generate_incident_number()
         incident_object_name="TBI"+ str(incident_number)
         print("Creating Incident object {0} for Widget {1}".format(incident_object_name, widget_object_name))
         #Create the incident object and store in an array.
         # Tell the newly created object, which incident number it is representing & all that shit
         touch_buddy_incidents[incident_object_name]=touch_buddy_Incident(widget_object_name,incident_number,incident_object_name)
+
+        ##Need to swap these two calls in order to provide the user with a faster response on the touch 10.
         #Generate and send a microsoft adaptive card via Webex Teams
         touch_buddy_incidents[incident_object_name].generate_incident_adaptive_card()
-        #Set the incident status to open, this will trigger all events that happen enr an incident is opened.
+        #Set the incident status to open, this will trigger all events that happen an incident is opened.
+        #Including database events
         touch_buddy_incidents[incident_object_name].incident_change_status('Open')
-    return incident_object_name
+    return incident_object_name  #Returns to button_class
 
 
 
+##To be Depricated this function is now replaced by the last row in the DB.
 #Routine to generate an incident number this might become more fancy later
+#THis function to be depricated as the database now provides the invident number from the last rocord id inserted.
 def generate_incident_number():
     global incident_number
     incident_number +=1

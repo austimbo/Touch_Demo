@@ -89,14 +89,16 @@ class webex_msg(object):
         except requests.exceptions.HTTPError as e:
             print("Error {0}".format(e))
             if e.response.status_code==401:
-                print("This is where we will refresh the token")
+                print("Webex Teams Access token Expiry Detecfted, Using Refresh Token")
                 self.refresh_token(message_text) #Did this so that I call retry the send message after refreshing the token.
 
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print("Error {0}".format(e))
 
     def refresh_token(self,message_text):
+        print("Refreshing Access token")
         refresh_WT__access_token()
+        print("Re-sending Message after token refresh")
         self.send_webex_message(message_text)
         return self.webex_request.status_code
 
