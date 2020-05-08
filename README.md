@@ -4,7 +4,7 @@ Touch Buddy is  a task reporting, tracking scheduling system for establishments 
 
 A common problem in such centres is that there are usually a finite number of technical-support resources allocated to a site. During events it is sometimes necessary for meeting hosts request assistance from these resources, without disrupting the meeting. It is also important to track the utilisation of support resources and the types of issues reported.
 
-![alt text](https://github.com/austimbo/touch_Demo/images/Touch_Buddy_overview.jpg?raw=true)
+![Graphical Overview](https://github.com/austimbo/Touch_Demo/blob/master/images/Touch_Buddy_overview.jpg?raw=true)
 
 ## Touch Buddy Fundamentals
 
