@@ -14,9 +14,11 @@ https://www.youtube.com/watch?v=vV-nV3DDqFg
 
 Touch buddy was designed for meeting rooms that utilise Cisco codes with Touch 10 control panels. The **Touch buddy** makes use of the codecs **room control** API which presents a help panel as an option to each meeting room. Users can choose an issue-type from a customisable menu. The request is passed to the Touch Buddy server which ten uses a **Webex Teams**  API to alert the appropriate support resource for that team. 
 
+![Panel](https://github.com/austimbo/Touch_Demo/blob/master/images/Touch_buddy_panel-1.jpg?raw=true)
+
 When support team members receive a support alert (via Webex Teams), they are presented a **Microsoft Adaptive Card**. The support team member who presses the acknowledge button on the **MS Card** has their details passed through to the appropriate rooms touch 10 panel. 
 
-
+![MS-Adaptive Cards](https://github.com/austimbo/Touch_Demo/blob/master/images/MS-adaptive_card_1.jpg?raw=true)
 
 ### Prerequisites
 This solution requires meeting rooms to be equipped with Cisco codecs with the Cisco **Touch 10** control panels.There is no limit to the number of codec systems supported.  My development environment was running code version **ce 9.9.9.3** .
