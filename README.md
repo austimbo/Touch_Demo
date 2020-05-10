@@ -4,6 +4,11 @@ Touch Buddy is  a task reporting, tracking scheduling system for establishments 
 
 A common problem in such centres is that the's usually a finite number of technical-support staff and multiple rooms. Tech staff are often working on one issue when subsequent issues are reported. Touch Buddy is a low-cost scalable and non intrusive and trackable means for tech staff to be altered to issues whilst working on others. 
 
+Here is a youtube vide explaining how the system works:
+
+https://www.youtube.com/watch?v=vV-nV3DDqFg
+
+
 ![Graphical Overview](https://github.com/austimbo/Touch_Demo/blob/master/images/Touch_Buddy_overview.jpg?raw=true)
 
 ## Touch Buddy Fundamentals
@@ -15,9 +20,20 @@ When support team members receive a support alert (via Webex Teams), they are pr
 
 
 ### Prerequisites
-This solution requires meeting rooms to be equipped with Cisco codecs running CE9.x software, it also requires that all meeting room codecs are equipped with Cisco **Touch 10** control panels.  
+This solution requires meeting rooms to be equipped with Cisco codecs with the Cisco **Touch 10** control panels.There is no limit to the number of codec systems supported.  My development environment was running code version **ce 9.9.9.3** .
+ 
+The python code was developed using Python 3.7 on a mac using **mac os 10.14**.  It will soon be testing under Linux and Windows. 
 
-The python code has been developed under Python 3.7. The was developed under MacOs 10.14 only so far. There's noting limiting it to MacOs. It will soon be testing under Linus and Windows. 
+**Cisco Webex Teams** access is required.  There is a Two-way communication with Webex Teams via the **messaging API and webhooks**. I will soon publish further details. As Webex Teams initiates HTTP communications to the API server via webhooks the API server needs to be reachable via webbed teams. I have used **ngrok** to make my API reachable from outside of my netted lab environment. Currently a user is required to configure **ngrok** manually, I have plans to automate the registration of ngrok's dynamically created forward link into webex teams. For now webhooks are required to be set up manually. Details can be found at: 
+
+
+https://developer.webex.com/docs/api/guides/webhooks
+
+
+
+  
+
+
 
 ```
 Give examples
@@ -25,7 +41,7 @@ Give examples
 
 ### Installing
 
-TBA
+
 
 ## License
 
